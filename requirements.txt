@@ -1,0 +1,5 @@
+telethon
+requests
+pyinstaller
+Pillow
+pystray
