@@ -1,0 +1,8 @@
+{
+    "TELEGRAM_API_ID": "",
+    "TELEGRAM_API_HASH": "",
+    "TELEGRAM_PHONE_NUMBER": "+55119XXXXXXXX",
+    "TELEGRAM_CANAL_MONITORADO": "@username_do_canal",
+    "DISCORD_WEBHOOK_URL": "",
+    "TELEGRAM_2FA_PASSWORD": ""
+}
