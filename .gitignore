@@ -1,0 +1,25 @@
+# Arquivos e pastas do Ambiente Virtual do Python
+venv/
+Lib/
+Scripts/
+Include/
+tcl/
+
+# Pastas de compilação do PyInstaller
+build/
+dist/
+
+# Arquivos gerados pelo PyInstaller
+*.spec
+
+# Arquivos de cache e compilados do Python
+__pycache__/
+*.pyc
+
+*.session
+*.session-journal
+
+config.json
+
+
+*.log

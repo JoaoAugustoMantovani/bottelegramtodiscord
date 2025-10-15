@@ -1,3 +1,4 @@
+# controller.py
 import os
 import asyncio
 from telethon import TelegramClient, events
@@ -14,6 +15,7 @@ class TelegramController:
         self.loop = None
 
     def setup(self):
+        # ... (esta função não muda)
         try:
             api_id = self.config['TELEGRAM_API_ID']
             api_hash = self.config['TELEGRAM_API_HASH']
@@ -34,7 +36,7 @@ class TelegramController:
             return False
         
     async def _message_handler(self, event):
-       
+        # ... (esta função não muda)
         self.logger.log(f"Nova mensagem recebida do canal: {getattr(event.chat, 'title', event.chat_id)}")
         
         downloaded_image_path = None
@@ -66,7 +68,7 @@ class TelegramController:
             return
 
         async def main():
- 
+            # ... (a lógica de login não muda)
             phone = self.config['TELEGRAM_PHONE_NUMBER']
             password = self.config.get('TELEGRAM_2FA_PASSWORD') or None
 
@@ -77,7 +79,6 @@ class TelegramController:
                 self.logger.log("Um código de login foi enviado para o seu Telegram.")
                 
                 try:
-                   
                     code = self.prompt_callback("Código de Login", "Por favor, insira o código recebido:")
                     if not code:
                         self.logger.log("[ERRO] Login cancelado. Código não inserido.")
@@ -87,7 +88,6 @@ class TelegramController:
                 except SessionPasswordNeededError:
                     self.logger.log("Senha de 2 fatores (2FA) necessária.")
                     if not password:
-                        
                         password = self.prompt_callback("Senha 2FA", "Sua senha de 2 fatores é necessária:")
                         if not password:
                             self.logger.log("[ERRO] Login cancelado. Senha não inserida.")
@@ -97,12 +97,22 @@ class TelegramController:
                 
                 self.logger.log("Login bem-sucedido!")
            
-
-            channel = self.config['TELEGRAM_CANAL_MONITORADO']
-            self.client.add_event_handler(self._message_handler, events.NewMessage(chats=[channel]))
+            # --- INÍCIO DA ALTERAÇÃO ---
+            channel_input = self.config['TELEGRAM_CANAL_MONITORADO']
+            try:
+                # Tenta converter a entrada para um número inteiro.
+                # Se for "-1003143492964", vira o número -1003143492964.
+                channel_entity = int(channel_input)
+            except ValueError:
+                # Se a conversão falhar (ex: para "@meucanal"), usa a string original.
+                channel_entity = channel_input
+            
+            self.client.add_event_handler(self._message_handler, events.NewMessage(chats=[channel_entity]))
             
             self.logger.log("Bot iniciado e escutando mensagens...")
-            self.logger.log(f"Monitorando o canal: {channel}")
+            self.logger.log(f"Monitorando o canal: {channel_input}") # Mostra o input original no log
+            # --- FIM DA ALTERAÇÃO ---
+            
             self.logger.log("Ponte para o Discord está ATIVA.")
             
             await self.client.run_until_disconnected()
