@@ -11,7 +11,6 @@ from model import ConfigManager
 from controller import TelegramController
 
 def resource_path(relative_path):
-    """ Retorna o caminho absoluto para o recurso, funcionando tanto no modo de desenvolvimento quanto no PyInstaller. """
     try:
         base_path = sys._MEIPASS
     except Exception:
@@ -31,13 +30,21 @@ class MainApplication:
         self.root.protocol("WM_DELETE_WINDOW", self.hide_window)
         
         tray_icon_successful = self.setup_tray_icon()
+        
+        config = self.model.load_config()
+        if config.get("AUTO_START", False):
+            self.view.log("Opção de 'Iniciar Automaticamente' detetada. Iniciando o bot...")
+            self.root.after(500, self.view.start_bot)
+
         if not tray_icon_successful:
             self.show_window()
         else:
-            self.hide_window()
+            if not config.get("AUTO_START", False):
+                self.hide_window()
+            else:
+                self.show_window()
 
     def setup_tray_icon(self):
-      
         try:
             image = Image.open(resource_path("icon.png"))
             menu = (
@@ -45,6 +52,7 @@ class MainApplication:
                 pystray.MenuItem("Sair", self.exit_application)
             )
             self.tray_icon = pystray.Icon("BotTelegramDiscord", image, "Bot Telegram-Discord", menu)
+            
             tray_thread = threading.Thread(target=self.tray_icon.run, daemon=True)
             tray_thread.start()
             return True 
@@ -58,7 +66,6 @@ class MainApplication:
             return False 
 
     def hide_window(self):
-      
         if self.tray_icon and self.tray_icon.visible:
             self.root.withdraw()
             self.view.log("Aplicação minimizada para a bandeja do sistema.")
@@ -66,13 +73,11 @@ class MainApplication:
             self.view.log("Ícone da bandeja não está ativo. A janela não será escondida.")
 
     def show_window(self):
-    
         self.root.deiconify()
         self.root.lift()
         self.root.focus_force()
 
     def exit_application(self):
-       
         self.view.log("Encerrando a aplicação...")
         if self.bot_thread and self.bot_thread.is_alive():
             self.stop_bot_thread()
@@ -82,7 +87,6 @@ class MainApplication:
         self.root.destroy()
    
     def prompt_for_input(self, title, prompt):
-       
         result_holder = []
         event = threading.Event()
         def _ask_string():
@@ -98,21 +102,17 @@ class MainApplication:
     def start_bot_thread(self):
         config_data = self.view.get_config_data()
         
-       
         required_fields = ["TELEGRAM_API_ID", "TELEGRAM_API_HASH", "TELEGRAM_PHONE_NUMBER", "DISCORD_WEBHOOK_URL"]
         
-       
         if not all(config_data.get(k) for k in required_fields):
             self.view.log("[ERRO] Todos os campos (exceto senha) devem ser preenchidos!")
             self.view.on_bot_stopped()
             return
         
-      
         if not config_data.get("TELEGRAM_CANAIS_MONITORADOS"):
             self.view.log("[ERRO] Adicione pelo menos um canal para monitorar!")
             self.view.on_bot_stopped()
             return
-      
 
         self.controller = TelegramController(config_data, self.view, self.prompt_for_input)
         def run_in_thread():
@@ -123,7 +123,6 @@ class MainApplication:
         self.bot_thread.start()
 
     def stop_bot_thread(self):
-      
         if self.controller and self.controller.client:
             self.view.log("Desconectando o cliente Telegram...")
             if self.controller.loop and self.controller.client.is_connected():
@@ -133,7 +132,6 @@ class MainApplication:
             self.view.on_bot_stopped()
 
 if __name__ == "__main__":
-    
     root = tk.Tk()
     app = MainApplication(root)
     root.mainloop()
