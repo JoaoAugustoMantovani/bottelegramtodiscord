@@ -21,7 +21,7 @@ class MessageStore:
             with open(self.store_file, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except (json.JSONDecodeError, Exception):
-            # Em caso de erro, começa com um mapa vazio para evitar crashes.
+           
             return {}
 
     def _save_map(self):
@@ -34,7 +34,7 @@ class MessageStore:
 
     def add_mapping(self, telegram_id, discord_id):
         """Adiciona um novo mapeamento com um timestamp."""
-        # Armazena o ID do Discord e a data/hora atual (em segundos)
+       
         self.message_map[str(telegram_id)] = {
             "discord_id": discord_id,
             "timestamp": time.time()
@@ -52,7 +52,6 @@ class MessageStore:
         Retorna o número de entradas removidas.
         """
         current_time = time.time()
-        # Converte as chaves para uma lista para poder modificar o dicionário durante a iteração
         expired_keys = [
             key for key, value in self.message_map.items()
             if current_time - value.get("timestamp", 0) > self.expiry_duration

@@ -11,11 +11,10 @@ class ConfigManager:
         try:
             with open(self.config_file, 'r', encoding='utf-8') as f:
                 config = json.load(f)
-                # --- LÓGICA DE COMPATIBILIDADE ---
-                # Se a chave antiga existir, converte para a nova e remove a antiga
+               
                 if "TELEGRAM_CANAL_MONITORADO" in config:
                     old_channel = config["TELEGRAM_CANAL_MONITORADO"]
-                    if old_channel: # Garante que não está vazio
+                    if old_channel:
                         config["TELEGRAM_CANAIS_MONITORADOS"] = [old_channel]
                     del config["TELEGRAM_CANAL_MONITORADO"]
                 return config

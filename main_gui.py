@@ -37,7 +37,7 @@ class MainApplication:
             self.hide_window()
 
     def setup_tray_icon(self):
-        # ... (esta função não muda)
+      
         try:
             image = Image.open(resource_path("icon.png"))
             menu = (
@@ -58,7 +58,7 @@ class MainApplication:
             return False 
 
     def hide_window(self):
-        # ... (esta função não muda)
+      
         if self.tray_icon and self.tray_icon.visible:
             self.root.withdraw()
             self.view.log("Aplicação minimizada para a bandeja do sistema.")
@@ -66,13 +66,13 @@ class MainApplication:
             self.view.log("Ícone da bandeja não está ativo. A janela não será escondida.")
 
     def show_window(self):
-        # ... (esta função não muda)
+    
         self.root.deiconify()
         self.root.lift()
         self.root.focus_force()
 
     def exit_application(self):
-        # ... (esta função não muda)
+       
         self.view.log("Encerrando a aplicação...")
         if self.bot_thread and self.bot_thread.is_alive():
             self.stop_bot_thread()
@@ -82,7 +82,7 @@ class MainApplication:
         self.root.destroy()
    
     def prompt_for_input(self, title, prompt):
-        # ... (esta função não muda)
+       
         result_holder = []
         event = threading.Event()
         def _ask_string():
@@ -98,22 +98,21 @@ class MainApplication:
     def start_bot_thread(self):
         config_data = self.view.get_config_data()
         
-        # --- INÍCIO DA ALTERAÇÃO ---
-        # Define os campos fixos que são obrigatórios
+       
         required_fields = ["TELEGRAM_API_ID", "TELEGRAM_API_HASH", "TELEGRAM_PHONE_NUMBER", "DISCORD_WEBHOOK_URL"]
         
-        # Verifica se os campos fixos estão preenchidos
+       
         if not all(config_data.get(k) for k in required_fields):
             self.view.log("[ERRO] Todos os campos (exceto senha) devem ser preenchidos!")
             self.view.on_bot_stopped()
             return
         
-        # Verifica se pelo menos um canal foi adicionado
+      
         if not config_data.get("TELEGRAM_CANAIS_MONITORADOS"):
             self.view.log("[ERRO] Adicione pelo menos um canal para monitorar!")
             self.view.on_bot_stopped()
             return
-        # --- FIM DA ALTERAÇÃO ---
+      
 
         self.controller = TelegramController(config_data, self.view, self.prompt_for_input)
         def run_in_thread():
@@ -124,7 +123,7 @@ class MainApplication:
         self.bot_thread.start()
 
     def stop_bot_thread(self):
-        # ... (esta função não muda)
+      
         if self.controller and self.controller.client:
             self.view.log("Desconectando o cliente Telegram...")
             if self.controller.loop and self.controller.client.is_connected():
@@ -134,8 +133,6 @@ class MainApplication:
             self.view.on_bot_stopped()
 
 if __name__ == "__main__":
-    if os.path.exists("bot_session.session"):
-        os.remove("bot_session.session")
     
     root = tk.Tk()
     app = MainApplication(root)

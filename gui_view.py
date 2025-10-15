@@ -9,15 +9,15 @@ class GuiView:
         self.stop_callback = stop_callback
 
         self.root.title("Bot Telegram-Discord")
-        self.root.geometry("600x750") # Aumenta a altura para comportar mais canais
+        self.root.geometry("600x750")
 
         self.entries = {}
         
-        # --- Frame de Configurações Gerais ---
+     
         config_frame = tk.LabelFrame(root, text="Configurações", padx=10, pady=10)
         config_frame.pack(pady=10, padx=10, fill="x")
         
-        # Campos que não mudam
+        
         fields = {
             "TELEGRAM_API_ID": "Telegram API ID:",
             "TELEGRAM_API_HASH": "Telegram API Hash:",
@@ -37,20 +37,20 @@ class GuiView:
             entry.pack(side="right", expand=True, fill="x")
             self.entries[key] = entry
 
-        # --- NOVA SEÇÃO DINÂMICA PARA CANAIS ---
+    
         channels_frame = tk.LabelFrame(root, text="Canais a Serem Monitorados", padx=10, pady=10)
         channels_frame.pack(pady=10, padx=10, fill="x")
 
         self.add_channel_button = tk.Button(channels_frame, text="+ Adicionar Canal", command=self.add_channel_field)
         self.add_channel_button.pack(pady=5)
         
-        # Frame que vai conter a lista de campos de canal
+      
         self.channel_fields_frame = tk.Frame(channels_frame)
         self.channel_fields_frame.pack(fill="x")
 
-        self.channel_entries = [] # Lista para guardar as referências dos campos de entrada de canal
+        self.channel_entries = [] 
 
-        # --- Frame de Ações (botões de salvar/iniciar/parar) ---
+      
         action_frame = tk.Frame(root, padx=10)
         action_frame.pack(pady=5, fill="x")
 
@@ -110,25 +110,25 @@ class GuiView:
             entry.delete(0, tk.END)
             entry.insert(0, config_data.get(key, ""))
         
-        # Limpa campos de canal existentes antes de carregar os novos
+       
         for entry in self.channel_entries:
             entry.master.destroy()
         self.channel_entries.clear()
         
-        # Carrega a lista de canais
+       
         channels = config_data.get("TELEGRAM_CANAIS_MONITORADOS", [])
         if channels:
             for channel in channels:
                 self.add_channel_field(channel)
         else:
-            # Garante que haja pelo menos um campo se a lista estiver vazia
+          
             self.add_channel_field()
 
     def save_config(self):
-        # Coleta dados dos campos fixos
+      
         config_data = {key: entry.get() for key, entry in self.entries.items()}
         
-        # Coleta a lista de canais dos campos dinâmicos
+       
         channels = [entry.get() for entry in self.channel_entries if entry.get().strip()]
         config_data["TELEGRAM_CANAIS_MONITORADOS"] = channels
         
