@@ -2,27 +2,27 @@ import json
 import os
 
 class ConfigManager:
-    """
-    Gerencia o arquivo de configuração (config.json).
-    Agora, apenas carrega e salva dados, sem interação com o usuário.
-    """
     def __init__(self, config_file='config.json'):
         self.config_file = config_file
 
     def load_config(self):
-        """Carrega a configuração do arquivo JSON. Se não existir, retorna um dict vazio."""
         if not os.path.exists(self.config_file):
             return {}
-        
         try:
             with open(self.config_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
+                config = json.load(f)
+                # --- LÓGICA DE COMPATIBILIDADE ---
+                # Se a chave antiga existir, converte para a nova e remove a antiga
+                if "TELEGRAM_CANAL_MONITORADO" in config:
+                    old_channel = config["TELEGRAM_CANAL_MONITORADO"]
+                    if old_channel: # Garante que não está vazio
+                        config["TELEGRAM_CANAIS_MONITORADOS"] = [old_channel]
+                    del config["TELEGRAM_CANAL_MONITORADO"]
+                return config
         except (json.JSONDecodeError, Exception):
-        
             return {}
 
     def save_config(self, config_data):
-        """Salva o dicionário de configuração fornecido no arquivo JSON."""
         try:
             with open(self.config_file, 'w', encoding='utf-8') as f:
                 json.dump(config_data, f, indent=4)
